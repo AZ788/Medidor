@@ -24,7 +24,9 @@ connection.connect((err) => {
 });
 
 app.post('/insertar', (req, res) => {
+  console.log('Solicitud POST recibida');
   const { serie, temp } = req.body;
+  console.log(`Datos recibidos: serie=${serie}, temp=${temp}`);
 
   const query = 'INSERT INTO datos (Fecha, Serie, Temperatura) VALUES (current_timestamp(), ?, ?)';
   connection.query(query, [serie, temp], (err, result) => {
@@ -37,6 +39,6 @@ app.post('/insertar', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor escuchando en http://0.0.0.0:${port}`);
 });

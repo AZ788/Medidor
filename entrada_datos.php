@@ -11,18 +11,34 @@ $mysqli = new mysqli($host, $user, $password, $dbname);
 if ($mysqli->connect_error) {
     die("Error en la conexión: " . $mysqli->connect_error);
 }
-// Obtener los datos de la solicitud POST
-$serie = $_POST['serie'];
-$temperatura = $_POST['temp'];
 
-// Ejecutar la consulta de inserción
-$res = $mysqli->query("INSERT INTO `datos` (`ID`, `Fecha`, `Serie`, `Temperatura`) VALUES (NULL, current_timestamp(), '$serie', '$temperatura');");
+// Obtener los datos de la solicitud POST, con validación
+$serie = isset($_POST['serie']) ? $mysqli->real_escape_string($_POST['serie']) : '';
+$temperatura = isset($_POST['temp']) ? $mysqli->real_escape_string($_POST['temp']) : '';
 
-// Verificar si la inserción fue exitosa
-if ($res) {
-    echo "Datos ingresados correctamente";
+if (!empty($serie) && !empty($temperatura)) {
+    // Preparar la consulta
+    $stmt = $mysqli->prepare("INSERT INTO datos (Fecha, Serie, Temperatura) VALUES (current_timestamp(), ?, ?)");
+    
+    // Verificar si la consulta fue preparada correctamente
+    if ($stmt) {
+        // Enlazar los parámetros
+        $stmt->bind_param('ss', $serie, $temperatura);
+        
+        // Ejecutar la consulta
+        if ($stmt->execute()) {
+            echo "Datos ingresados correctamente";
+        } else {
+            echo "Error al ingresar los datos: " . $stmt->error;
+        }
+        
+        // Cerrar la declaración preparada
+        $stmt->close();
+    } else {
+        echo "Error en la preparación de la consulta: " . $mysqli->error;
+    }
 } else {
-    echo "Error al ingresar los datos: " . $mysqli->error;
+    echo "Faltan datos de entrada";
 }
 
 // Cerrar la conexión a la base de datos

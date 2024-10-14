@@ -5,11 +5,10 @@ const session = require('express-session');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
 const routes = require('./routes/auth');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Configuración de la base de datos
 const db = mysql.createConnection({

@@ -1,117 +1,40 @@
-/* Estilos generales */
 body {
-    font-family: 'Playfair Display', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-  }
-  
-  header {
-    background-color: #1f618d;
-    color: white;
-    padding: 15px 0;
-  }
-  
-  .container {
-    width: 80%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin: 0;
-  }
-  
-  nav ul {
-    list-style: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-  }
-  
-  nav ul li {
-    margin-right: 20px;
-  }
-  
-  nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    transition: color 0.3s;
-  }
-  
-  nav ul li a:hover {
-    color: #f0ad4e;
-  }
-  
-  /* Información de usuario */
-  .user-info {
-    display: flex;
-    align-items: center;
-    color: white;
-    font-size: 18px;
-  }
-  
-  .user-info i {
-    margin-right: 10px;
-    font-size: 24px;
-  }
-  
-  /* Cerrar sesión */
-  .logout a {
-    color: white;
-    font-size: 18px;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  
-  .logout a:hover {
-    color: #f0ad4e;
-  }
-  
-  /* Sección de introducción */
-  .intro {
-    text-align: center;
-    margin-top: 30px;
-    padding: 50px 0;
-    background-color: #fff;
-  }
-  
-  .intro h2 {
-    font-size: 2rem;
-    color: #1f618d;
-  }
-  
-  .intro p {
-    font-size: 1.2rem;
-    color: #333;
-  }
-  
-  /* Sección del gráfico */
-  .grafica {
-    background-color: #fff;
-    padding: 30px 0;
-    margin-top: 20px;
-  }
-  
-  iframe {
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Pie de página */
-  footer {
-    background-color: #1f618d;
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-  }
-  
-  footer p {
-    margin: 0;
-  }
-  
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container, .register-container, .confirmation-container, .measurement-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}

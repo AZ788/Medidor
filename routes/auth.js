@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
@@ -30,11 +30,12 @@ router.get('/login', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { user, password } = req.body;
-  db.query('SELECT * FROM users WHERE user = ?', [user], (err, results) => {
+  db.query('SELECT * FROM users WHERE user = ?', [user], async (err, results) => {
     if (err) throw err;
     if (results.length > 0) {
       const user = results[0];
-      if (bcrypt.compareSync(password, user.password)) {
+      const isMatch = await argon2.verify(user.password, password);
+      if (isMatch) {
         if (user.confirmed) {
           req.session.userId = user.id;
           res.redirect('/measurement');
@@ -55,14 +56,14 @@ router.get('/register', (req, res) => {
   res.render('register', { error: null });
 });
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { user, email, password, r_password } = req.body;
   
   if (password !== r_password) {
     return res.render('register', { error: 'Las contraseñas no coinciden.' });
   }
 
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const hashedPassword = await argon2.hash(password);
   const confirmationToken = uuidv4();
 
   db.query('INSERT INTO users (user, email, password, confirmationToken) VALUES (?, ?, ?, ?)', 
@@ -70,7 +71,7 @@ router.post('/register', (req, res) => {
     (err, result) => {
       if (err) throw err;
       
-      const confirmUrl = `http://localhost:5000/confirm/${confirmationToken}`;
+      const confirmUrl = `http://localhost:3000/confirm/${confirmationToken}`;
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,

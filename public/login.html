@@ -5,21 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Seguro</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* Estilos generales */
-    </style>
+    <link rel="stylesheet" href="/css/estilos.css">
 </head>
 <body>
-
-<div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    <form action="/login" method="POST">
-        <input type="text" name="user" placeholder="Nombre de Usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Entrar</button>
-    </form>
-    <button class="register-button" onclick="window.location.href='/register'">Registrar</button>
-</div>
-
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form action="/auth/login" method="POST">
+            <input type="text" name="user" placeholder="Nombre de Usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <button class="register-button" onclick="window.location.href='/register'">Registrar</button>
+    </div>
 </body>
 </html>

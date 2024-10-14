@@ -1,29 +1,24 @@
 const express = require('express');
 const path = require('path');
-const session = require('express-session');
-
-const loginRoute = require('./routes/login');
-const registerRoute = require('./routes/register');
-
 const app = express();
+const authRoutes = require('./routes/auth');
 
-// Middleware
-app.use(express.json());
+// Middleware para manejar datos POST
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: 'secret_key',
-  resave: false,
-  saveUninitialized: true
-}));
+
+// Usar las rutas de autenticación
+app.use('/auth', authRoutes);
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas
-app.use(loginRoute);
-app.use(registerRoute);
+// Ruta raíz
+app.get('/', (req, res) => {
+  res.redirect('/auth/login');
+});
 
-// Escuchar el servidor
-app.listen(5000, () => {
-  console.log('Servidor corriendo en el puerto 5000');
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });

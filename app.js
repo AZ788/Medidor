@@ -7,14 +7,14 @@ const authRoutes = require('./routes/auth');
 app.use(express.urlencoded({ extended: true }));
 
 // Usar las rutas de autenticación
-app.use('/auth', authRoutes);
+app.use('/routes/auth', authRoutes);
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta raíz
 app.get('/', (req, res) => {
-  res.redirect('/auth/login');
+  res.redirect('/routes/auth/login');
 });
 
 // Iniciar el servidor

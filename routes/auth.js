@@ -6,12 +6,12 @@ const router = express.Router();
 router.use(express.static(path.join(__dirname, '../public')));
 
 // Ruta para el login
-router.get('/login', (req, res) => {
+router.get('/public/login', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'login.html'));
 });
 
 // Ruta para el registro
-router.get('/register', (req, res) => {
+router.get('/public/register', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'register.html'));
 });
 

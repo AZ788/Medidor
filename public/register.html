@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="/public/css/estilos.css">
 </head>
 <body>
     <div class="register-container">
         <h2>Registro de Usuario</h2>
-        <form action="/auth/register" method="POST">
+        <form action="/public/auth/register" method="POST">
             <input type="text" placeholder="Nombre de Usuario" name="user" required>
             <input type="email" placeholder="Email" name="mail" required>
             <input type="password" placeholder="Password" name="password" required>
@@ -21,7 +21,7 @@
             </label>
             <button type="submit">Registrar</button>
         </form>
-        <button class="login-button" onclick="window.location.href='/login'">Ya tengo una cuenta</button>
+        <button class="login-button" onclick="window.location.href='/public/public/login'">Ya tengo una cuenta</button>
     </div>
 </body>
 </html>

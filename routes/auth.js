@@ -1,94 +1,117 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const pool = require('../config/database');
-const nodemailer = require('nodemailer');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+const mysql = require('mysql');
+const nodemailer = require('nodemailer');
+const { v4: uuidv4 } = require('uuid');
 
-// Renderizar el formulario de login
-router.get('/login', (req, res) => {
-  res.render('login');
+// Configuración de la base de datos
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
-// Validar el login
-router.post('/login', async (req, res) => {
+// Configuración de Nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Ruta de login
+router.get('/login', (req, res) => {
+  res.render('login', { error: null });
+});
+
+router.post('/login', (req, res) => {
   const { user, password } = req.body;
-
-  try {
-    const [rows] = await pool.query('SELECT * FROM users WHERE user = ?', [user]);
-
-    if (rows.length > 0) {
-      const userRecord = rows[0];
-
-      // Comparar la contraseña cifrada
-      const match = await bcrypt.compare(password, userRecord.password);
-
-      if (match) {
-        req.session.logged = true;
-        req.session.userId = userRecord.id;
-        res.redirect('/medicion');
+  db.query('SELECT * FROM users WHERE user = ?', [user], (err, results) => {
+    if (err) throw err;
+    if (results.length > 0) {
+      const user = results[0];
+      if (bcrypt.compareSync(password, user.password)) {
+        if (user.confirmed) {
+          req.session.userId = user.id;
+          res.redirect('/measurement');
+        } else {
+          res.render('login', { error: 'Por favor confirma tu correo electrónico.' });
+        }
       } else {
-        res.render('login', { error: 'Contraseña incorrecta' });
+        res.render('login', { error: 'Contraseña incorrecta.' });
       }
     } else {
-      res.render('login', { error: 'Usuario no encontrado' });
+      res.render('login', { error: 'Usuario no encontrado.' });
     }
-  } catch (error) {
-    res.status(500).send('Error en el servidor');
-  }
+  });
 });
 
-// Renderizar el formulario de registro
+// Ruta de registro
 router.get('/register', (req, res) => {
-  res.render('register');
+  res.render('register', { error: null });
 });
 
-// Procesar el registro de usuario
-router.post('/register', async (req, res) => {
+router.post('/register', (req, res) => {
   const { user, email, password, r_password } = req.body;
-
+  
   if (password !== r_password) {
-    return res.render('register', { error: 'Las contraseñas no coinciden' });
+    return res.render('register', { error: 'Las contraseñas no coinciden.' });
   }
 
-  try {
-    const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const confirmationToken = uuidv4();
 
-    if (existingUser.length > 0) {
-      return res.render('register', { error: 'Correo ya registrado' });
+  db.query('INSERT INTO users (user, email, password, confirmationToken) VALUES (?, ?, ?, ?)', 
+    [user, email, hashedPassword, confirmationToken], 
+    (err, result) => {
+      if (err) throw err;
+      
+      const confirmUrl = `http://localhost:3000/confirm/${confirmationToken}`;
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Confirma tu cuenta',
+        html: `<h1>Gracias por registrarte</h1>
+               <p>Haz clic en el siguiente enlace para confirmar tu cuenta: <a href="${confirmUrl}">Confirmar</a></p>`
+      };
+      
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) throw err;
+        res.render('emailConfirmation');
+      });
+  });
+});
+
+// Ruta para confirmar el email
+router.get('/confirm/:token', (req, res) => {
+  const token = req.params.token;
+  db.query('SELECT * FROM users WHERE confirmationToken = ?', [token], (err, results) => {
+    if (err) throw err;
+    if (results.length > 0) {
+      db.query('UPDATE users SET confirmed = 1 WHERE confirmationToken = ?', [token], (err, result) => {
+        if (err) throw err;
+        res.send('Correo confirmado, ahora puedes iniciar sesión.');
+      });
+    } else {
+      res.send('Token inválido.');
     }
+  });
+});
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await pool.query('INSERT INTO users (user, email, password) VALUES (?, ?, ?)', [user, email, hashedPassword]);
-
-    // Enviar correo de confirmación
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'edwinsamboni2004@gmail.com',
-        pass: 'AZUREBLADESB2004',
-      },
-    });
-
-    const mailOptions = {
-      from: 'edwinsamboni2004@gmail.com',
-      to: email,
-      subject: 'Confirmación de registro',
-      text: 'Gracias por registrarte en Medidor de Temperatura.',
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return console.log(error);
-      }
-    });
-
+// Ruta de medición
+router.get('/measurement', (req, res) => {
+  if (req.session.userId) {
+    res.render('measurement');
+  } else {
     res.redirect('/login');
-  } catch (error) {
-    res.status(500).send('Error en el servidor');
   }
 });
 
-// Cerrar sesión
+// Ruta para cerrar sesión
 router.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/login');

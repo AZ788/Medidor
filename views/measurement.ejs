@@ -1,20 +1,151 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mediciones</title>
-  <link rel="stylesheet" href="/css/estilos.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Temperaturas Refinado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-  <div class="measurement-container">
-    <h2>Bienvenido a la página de medición</h2>
-    <p>Aquí es donde se mostrará la gráfica de medición.</p>
-    <canvas id="measurementGraph"></canvas>
-    <button onclick="window.location.href='/logout'">Cerrar Sesión</button>
-  </div>
-  <script>
-    // Aquí vendrá el código de la gráfica más adelante
-  </script>
+    <header>
+        <h1>Monitor de Temperaturas</h1>
+        <div class="user-controls">
+            <button id="theme-toggle" aria-label="Cambiar tema"><i class="fas fa-moon"></i></button>
+            <button class="btn btn-user" id="userBtn"><i class="fas fa-user"></i> <%= usuario.nombre %></button>
+            <button class="btn btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard">
+            <div class="dashboard-item">
+                <h3>Temperatura Actual</h3>
+                <p id="temp-actual"><%= temperaturaActual %> °C</p>
+            </div>
+            <div class="dashboard-item">
+                <h3>Temperatura Máxima</h3>
+                <p id="temp-max"><%= temperaturaMaxima %> °C</p>
+            </div>
+            <div class="dashboard-item">
+                <h3>Temperatura Mínima</h3>
+                <p id="temp-min"><%= temperaturaMinima %> °C</p>
+            </div>
+            <div class="dashboard-item">
+                <h3>Última Actualización</h3>
+                <p id="last-update"><%= ultimaActualizacion %></p>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Gráfica de Termocupla</h2>
+            <div id="grafico-termocupla" style="width: 100%; height: 400px;"></div>
+        </div>
+        <div class="card">
+            <h2>Gráfica de PT100</h2>
+            <div id="grafico-pt100" style="width: 100%; height: 400px;"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Monitor de Temperaturas Refinado. Todos los derechos reservados.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <script type="text/javascript">
+        function cargarGrafico(container, apiUrl, titulo) {
+            Highcharts.chart(container, {
+                chart: {
+                    type: 'area',
+                    animation: Highcharts.svg,
+                    events: {
+                        load: function() {
+                            setInterval(() => {
+                                updateChart(this, apiUrl);
+                            }, 5000);
+                        }
+                    }
+                },
+                title: {
+                    text: titulo
+                },
+                xAxis: {
+                    type: 'datetime',
+                    title: {
+                        text: 'Fecha'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Temperatura (°C)'
+                    }
+                },
+                series: [{
+                    name: 'Temperatura',
+                    data: []
+                }]
+            });
+        }
+    
+        function updateChart(chart, apiUrl) {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const temperatureData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+                    chart.series[0].setData(temperatureData);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        cargarGrafico('grafico-termocupla', '/api/termocupla', 'Temperatura de Termocupla');
+        cargarGrafico('grafico-pt100', '/api/pt100', 'Temperatura de PT100');
+
+        // Funcionalidad de los botones
+        document.getElementById('userBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Perfil de Usuario',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>Nombre:</strong> <%= usuario.nombre %></p>
+                        <p><strong>Correo:</strong> <%= usuario.email %></p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Cerrar'
+            });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Vas a cerrar sesión en el sistema",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/logout';
+                }
+            });
+        });
+
+        // Cambio de tema
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+        });
+    </script>
 </body>
 </html>
-

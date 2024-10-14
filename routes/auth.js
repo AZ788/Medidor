@@ -107,7 +107,7 @@ router.get('/confirm/:token', (req, res) => {
 // Ruta de medición
 router.get('/measurement', (req, res) => {
   if (req.session.userId) {
-    res.render('front');
+    res.render('measurement');
   } else {
     res.redirect('/login');
   }

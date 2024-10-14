@@ -72,7 +72,7 @@ router.post('/register', async (req, res) => {
     (err, result) => {
       if (err) throw err;
       
-      const confirmUrl = `http://localhost:5000/confirm/${confirmationToken}`;
+      const confirmUrl = `http://98.81.214.228:5000/confirm/${confirmationToken}`;
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,

@@ -39,7 +39,7 @@ router.post('/login', (req, res) => {
       if (isMatch) {
         if (user.confirmed) {
           req.session.userId = user.id;
-          res.redirect('/front');
+          res.redirect('/measurement');
         } else {
           res.render('login', { error: 'Por favor confirma tu correo electrónico.' });
         }
@@ -105,7 +105,7 @@ router.get('/confirm/:token', (req, res) => {
 });
 
 // Ruta de medición
-router.get('/front', (req, res) => {
+router.get('/measurement', (req, res) => {
   if (req.session.userId) {
     res.render('front');
   } else {

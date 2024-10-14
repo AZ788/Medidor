@@ -58,6 +58,8 @@
     .register-container .terms {
       text-align: left;
       margin-top: 15px;
+      display: flex;
+      align-items: center;
     }
     .register-container .terms input {
       width: auto;
@@ -79,7 +81,7 @@
       <input type="password" name="r_password" placeholder="Repite Contraseña" required>
       <div class="terms">
         <input type="checkbox" id="terms" name="terms" required>
-        <label for="terms">Acepto los <a href="/terms">Términos y Condiciones</a></label>
+        <label for="terms">Acepto los <a href="/terms" target="_blank">Términos y Condiciones</a></label>
       </div>
       <button type="submit">Registrar</button>
     </form>

@@ -39,7 +39,7 @@ router.post('/login', (req, res) => {
       if (isMatch) {
         if (user.confirmed) {
           req.session.userId = user.id;
-          res.redirect('/measurement');
+          res.redirect('/front');
         } else {
           res.render('login', { error: 'Por favor confirma tu correo electrónico.' });
         }

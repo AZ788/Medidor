@@ -47,7 +47,7 @@ app.get('/pt100', (req, res) => {
     res.redirect('/login');  // Redirigir si no está autenticado
   }
 });
-router.get('/wel', (req, res) => {
+app.get('/wel', (req, res) => {
   res.render('welcome');
 });
 // Rutas

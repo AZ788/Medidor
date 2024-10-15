@@ -175,6 +175,7 @@
     <div class="graficas">
       <div class="grafica" id="termocupla-grafica"></div>
       <div class="grafica" id="pt100-grafica"></div>
+      <div class="grafica" id="combinada-grafica"></div>
     </div>
   </div>
 
@@ -197,12 +198,16 @@
         .then(data => {
           const termocuplaChart = Highcharts.charts[0];
           const pt100Chart = Highcharts.charts[1];
+          const combinadaChart = Highcharts.charts[2];
 
           const termocuplaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
           const pt100Data = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
 
           termocuplaChart.series[0].setData(termocuplaData);
           pt100Chart.series[0].setData(pt100Data);
+
+          combinadaChart.series[0].setData(termocuplaData);
+          combinadaChart.series[1].setData(pt100Data);
 
           // Actualizar valores de resumen
           document.getElementById('valor-serie').textContent = termocuplaData[termocuplaData.length - 1][1].toFixed(2) + '°C';
@@ -271,6 +276,43 @@
         name: 'PT100',
         data: []
       }]
+    });
+
+    // Gráfico combinado
+    Highcharts.chart('combinada-grafica', {
+      chart: {
+        type: 'spline',
+        backgroundColor: '#fff'
+      },
+      title: {
+        text: 'Temperaturas Combinadas',
+        style: {
+          fontSize: '1.5rem',
+          fontWeight: '600'
+        }
+      },
+      xAxis: {
+        type: 'datetime',
+        labels: {
+          format: '{value:%H:%M:%S}'
+        }
+      },
+      yAxis: {
+        title: {
+          text: 'Temperatura (°C)'
+        },
+        max: 250
+      },
+      series: [
+        {
+          name: 'Termocupla',
+          data: []
+        },
+        {
+          name: 'PT100',
+          data: []
+        }
+      ]
     });
 
     // Actualización periódica de datos cada 500 ms

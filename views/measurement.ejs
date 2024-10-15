@@ -9,6 +9,62 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007bff;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            background-color: #ff6347;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        header a:hover {
+            background-color: #ff4500;
+        }
+
+        #container {
+            margin: 40px auto;
+            width: 80%;
+        }
+
+        .highcharts-description {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        footer {
+            background-color: #007bff;
+            padding: 10px;
+            text-align: center;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,81 +72,57 @@
         <a href="/logout">Cerrar sesión</a>
     </header>
 
-    <!-- Gráfico combinado -->
-    <section>
-        <h2>Termocupla vs PT100 (Gráfico combinado)</h2>
-        <div id="combinedChart"></div>
-        <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
-    </section>
-
-    <!-- Gráfico individual de Termocupla -->
-    <section>
-        <h2>Gráfico de Termocupla</h2>
-        <div id="termocuplaChart"></div>
-    </section>
-
-    <!-- Gráfico individual de PT100 -->
-    <section>
-        <h2>Gráfico de PT100</h2>
-        <div id="pt100Chart"></div>
-    </section>
+    <div id="container"></div>
+    <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
 
     <script>
-        function createChart(container, title, name, data, color) {
-            Highcharts.chart(container, {
-                chart: { type: 'areaspline' },
-                title: { text: title },
-                xAxis: {
-                    type: 'datetime',
-                    title: { text: 'Tiempo' },
-                    labels: { format: '{value:%Y-%m-%d %H:%M:%S}' },
-                    tickInterval: 1000 * 60 * 60 // 1 hora
-                },
-                yAxis: {
-                    title: { text: 'Temperatura (°C)' },
-                    max: 250,
-                    labels: { formatter: function() { return this.value + '°C'; } }
-                },
-                series: [{
-                    name: name,
-                    data: data,
-                    color: color
-                }],
-                plotOptions: {
-                    areaspline: {
-                        marker: {
-                            enabled: false
-                        }
-                    }
-                }
-            });
-        }
+        Highcharts.chart('container', {
+            chart: {
+                type: 'areaspline'
+            },
+            title: {
+                text: 'Termocupla vs PT100'
+            },
+            series: [{
+                name: 'Serie',
+                data: []
+            }, {
+                name: 'Temperatura',
+                data: []
+            }],
+            xAxis: {
+                type: 'datetime',
+                title: { text: 'Tiempo' },
+                labels: { format: '{value:%Y-%m-%d %H:%M:%S}' },
+                tickInterval: 1000 * 60 * 60
+            },
+            yAxis: {
+                title: { text: 'Temperatura (°C)' },
+                max: 250,
+                labels: { formatter: function() { return this.value + '°C'; } }
+            }
+        });
 
-        function updateCharts() {
+        function updateChart() {
             fetch('/data')
                 .then(response => response.json())
                 .then(data => {
+                    const chart = Highcharts.charts[0];
                     const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
                     const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
 
-                    // Gráfico combinado
-                    createChart('combinedChart', 'Termocupla vs PT100', 'Serie y Temperatura', [
-                        { name: 'Termocupla', data: serieData, color: 'rgba(95, 218, 147, 1)' },
-                        { name: 'PT100', data: temperaturaData, color: 'rgba(255, 87, 51, 1)' }
-                    ]);
-
-                    // Gráfico individual de Termocupla
-                    createChart('termocuplaChart', 'Gráfico de Termocupla', 'Termocupla', serieData, 'rgba(95, 218, 147, 1)');
-
-                    // Gráfico individual de PT100
-                    createChart('pt100Chart', 'Gráfico de PT100', 'PT100', temperaturaData, 'rgba(255, 87, 51, 1)');
+                    chart.series[0].setData(serieData);
+                    chart.series[1].setData(temperaturaData);
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        // Actualiza las gráficas cada 5 segundos
-        setInterval(updateCharts, 5000);
-        updateCharts();
+        setInterval(updateChart, 5000);
+        updateChart();
     </script>
+
+    <footer>
+        <p>Temperatubies© 2024 | <a href="#">Términos y condiciones</a></p>
+    </footer>
 </body>
 </html>

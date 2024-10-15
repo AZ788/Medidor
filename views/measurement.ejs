@@ -119,61 +119,207 @@
       padding: 20px;
       border: 1px solid #ddd;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0,  0, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Bienvenido, <%= usuario %></h1>
- <a href="#" class="cerrar-sesion">Cerrar sesión <i class="fas fa-sign-out-alt"></i></a>
+    <a href="/logout" class="cerrar-sesion">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </a>
   </header>
-  <main>
-    <div id="container">
-      <div class="temperatura-actual">
-        <div class="cuadro">
-          <p class="titulo">Serie actual</p>
-          <p id="valor-serie" class="valor">--</p>
-        </div>
-        <div class="cuadro">
-          <p class="titulo">Temperatura actual</p>
-          <p id="valor-temperatura" class="valor">--</p>
-        </div>
-      </div>
-      <div class="graficas">
-        <div class="grafica" id="grafica-serie"></div>
-        <div class="grafica" id="grafica-temperatura"></div>
-      </div>
+  <div class="temperatura-actual">
+    <div class="cuadro">
+      <div class="titulo">Serie</div>
+      <div class="valor" id="valor-serie">0°C</div>
     </div>
-  </main>
-  <footer>
-    <p>&copy; 2023 - <%= usuario %></p>
-    <a href="#">Acerca de</a>
-  </footer>
+    <div class="cuadro">
+      <div class="titulo">Temperatura</div>
+      <div class="valor" id="valor-temperatura">0°C</div>
+    </div>
+  </div>
+  <div id="container"></div>
+  <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
   <script>
+    Highcharts.chart('container', {
+      chart: {
+        type: 'areaspline'
+      },
+      title: {
+        text: 'Termocupla vs PT100',
+        style: {
+          fontSize: '1.8rem',
+          fontWeight: 'bold'
+        }
+      },
+      series: [{
+        name: 'Serie',
+        data: []
+      }, {
+        name: 'Temperatura',
+        data: []
+      }],
+      xAxis: {
+        type: 'datetime',
+        title: {
+          text: 'Tiempo'
+        },
+        labels: {
+          format: '{value:%d-%m-%Y %H:%M:%S}'
+        },
+        tickInterval: 1000 * 60 * 60
+      },
+      yAxis: {
+        title: {
+          text: 'Temperatura (°C)'
+        },
+        max: 250,
+        labels: {
+          formatter: function() {
+            return this.value + '°C';
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        crosshairs: true
+      },
+      plotOptions: {
+        areaspline: {
+          fillOpacity: 0.5
+        }
+      }
+    });
     function updateChart() {
       fetch('/data')
         .then(response => response.json())
         .then(data => {
-          const chartSerie = Highcharts.charts[0];
-          const chartTemperatura = Highcharts.charts[1];
-          const serieData = data.map(item => {
-            const fecha = new Date(item.Fecha);
-            return [fecha.toLocaleString(), parseFloat(item.Serie)];
-          });
-          const temperaturaData = data.map(item => {
-            const fecha = new Date(item.Fecha);
-            return [fecha.toLocaleString(), parseFloat(item.Temperatura)];
-          });
-          chartSerie.series[0].setData(serieData);
-          chartTemperatura.series[0].setData(temperaturaData);
+          const chart = Highcharts.charts[0];
+          const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
+          const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+          chart.series[0].setData(serieData);
+          chart.series[1].setData(temperaturaData);
           document.getElementById('valor-serie').innerHTML = serieData[serieData.length - 1][1].toFixed(2) + '°C';
           document.getElementById('valor-temperatura').innerHTML = temperaturaData[temperaturaData.length - 1][1].toFixed(2) + '°C';
         })
         .catch(error => console.error('Error fetching data:', error));
     }
+    setInterval(updateChart, 500);
     updateChart();
-    setInterval(updateChart, 60000); // actualiza la gráfica cada 1 minuto
   </script>
+  <div class="graficas">
+    <div class="grafica">
+      <div id="pt100-chart"></div>
+      <p class="highcharts-description">Gráfica de la temperatura PT100.</p>
+    </div>
+    <div class="grafica">
+      <div id="termocupla-chart"></div>
+      <p class="highcharts-description">Gráfica de la temperatura Termocupla.</p>
+    </div>
+  </div>
+  <script>
+    Highcharts.chart('pt100-chart', {
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: 'Temperatura PT100',
+        style: {
+          fontSize: '1.8rem',
+          fontWeight: 'bold'
+        }
+      },
+      series: [{
+        name: 'PT100',
+        data: []
+      }],
+      xAxis: {
+        type: 'datetime',
+        title: {
+          text: 'Tiempo'
+        },
+        labels: {
+          format: '{value:%d-%m-%Y %H:%M:%S}'
+        },
+        tickInterval: 1000 * 60 * 60
+      },
+      yAxis: {
+        title: {
+          text: 'Temperatura (°C)'
+        },
+        max: 250,
+        labels: {
+          formatter: function() {
+            return this.value + '°C';
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        crosshairs: true
+      }
+    });
+    Highcharts.chart('termocupla-chart', {
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: 'Temperatura Termocupla',
+        style: {
+          fontSize: '1.8rem',
+          fontWeight: 'bold'
+        }
+      },
+      series: [{
+        name: 'Termocup la',
+        data: []
+      }],
+      xAxis: {
+        type: 'datetime',
+        title: {
+          text: 'Tiempo'
+        },
+        labels: {
+          format: '{value:%d-%m-%Y %H:%M:%S}'
+        },
+        tickInterval: 1000 * 60 * 60
+      },
+      yAxis: {
+        title: {
+          text: 'Temperatura (°C)'
+        },
+        max: 250,
+        labels: {
+          formatter: function() {
+            return this.value + '°C';
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        crosshairs: true
+      }
+    });
+    function updateCharts() {
+      fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+          const pt100Chart = Highcharts.charts[1];
+          const termocuplaChart = Highcharts.charts[2];
+          const pt100Data = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
+          const termocuplaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+          pt100Chart.series[0].setData(pt100Data);
+          termocuplaChart.series[0].setData(termocuplaData);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+    setInterval(updateCharts, 500);
+    updateCharts();
+  </script>
+  <footer>
+    <p>Temperatubies 2024 | <a href="#">Términos y condiciones</a></p>
+  </footer>
 </body>
 </html>

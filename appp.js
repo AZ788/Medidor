@@ -35,7 +35,7 @@ app.post('/insertar', (req, res) => {
       res.status(500).send('Error al insertar los datos');
       return;
     }
-    res.send('Datos ingresados correctamente');
+    res.send('Datos ingresados correctamentes');
   });
 });
 

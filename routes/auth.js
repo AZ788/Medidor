@@ -125,11 +125,11 @@ router.get('/measurement', (req, res) => {
     // Obtén el nombre del usuario de la base de datos utilizando su ID de sesión
     const userId = req.session.userId;
     
-    db.query('SELECT nombre FROM users WHERE id = ?', [userId], (err, results) => {
+    db.query('SELECT username FROM users WHERE id = ?', [userId], (err, results) => {
       if (err) throw err;
       
       if (results.length > 0) {
-        const usuario = results[0];  // Información del usuario
+        const usuario = results[0].username;  // Información del usuario
         res.render('measurement', { usuario });  // Pasar 'usuario' al renderizar la vista
       } else {
         res.redirect('/login');  // Redirigir si el usuario no se encuentra

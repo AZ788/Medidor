@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/estilos.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: linear-gradient(to right, #ece9e6, #ffffff);
             display: flex;
             justify-content: center;
@@ -36,12 +36,14 @@
             max-width: 100%;
             height: auto;
             margin-bottom: 20px;
+            border-radius: 10px;
         }
         .welcome-container .contact-info {
             margin-bottom: 20px;
         }
         .welcome-container .contact-info p {
             margin: 5px 0;
+            font-size: 0.9rem;
         }
         .welcome-container .login-btn {
             background-color: #007bff;
@@ -51,20 +53,21 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .welcome-container .login-btn:hover {
             background-color: #0056b3;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="welcome-container">
-        <h1>Bienvenido a [Tu Página]</h1>
+        <h1>Bienvenido a Temperatubies</h1>
         <p>Somos una empresa dedicada a proporcionar las mejores soluciones en medición de temperatura. Nuestra plataforma ofrece herramientas avanzadas para monitorear y analizar datos en tiempo real.</p>
         <div class="contact-info">
-            <p><strong>Teléfono:</strong> +1 234 567 890</p>
-            <p><strong>Correo Electrónico:</strong> contacto@tupagina.com</p>
+            <p><strong>Teléfono:</strong> +57 321 567 890</p>
+            <p><strong>Correo Electrónico:</strong> contacto@gmail.com</p>
         </div>
         <img src="ruta/a/tu/grafico.png" alt="Gráfico de Ejemplo">
         <button class="login-btn" onclick="window.location.href='/login'">Iniciar Sesión</button>

@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); 
 const router = express.Router();
 const argon2 = require('argon2');
 const mysql = require('mysql');
@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  secure:true
+  secure: true
 });
 
 // Ruta de login
@@ -54,7 +54,6 @@ router.post('/login', (req, res) => {
 
 // Ruta de registro
 router.get('/register', (req, res) => {
-  
   res.render('register', { error: null });
 });
 
@@ -94,7 +93,6 @@ router.post('/register', async (req, res) => {
           </div>
         `
       };
-      
       
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) throw err;
@@ -140,6 +138,16 @@ router.get('/measurement', (req, res) => {
   }
 });
 
+// Ruta para obtener datos de temperatura
+router.get('/data', (req, res) => {
+  const query = 'SELECT DATE_FORMAT(Fecha, "%Y-%m-%d %H:%i:%s") as Fecha, Serie, Temperatura FROM datos ORDER BY Fecha DESC LIMIT 10';
+  db.query(query, (err, result) => {
+    if (err) {
+      return res.status(500).send('Error en la consulta');
+    }
+    res.json(result);
+  });
+});
 
 // Ruta para cerrar sesión
 router.get('/logout', (req, res) => {

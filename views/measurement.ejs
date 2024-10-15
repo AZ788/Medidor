@@ -2,9 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mediciones de Temperatura</title>
-    <link rel="stylesheet" href="/path-to-your-css/estilos.css">
+    <link href="/estilos.css" rel="stylesheet">
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/data.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -13,82 +12,57 @@
 </head>
 <body>
     <header>
-        <h1>Mediciones de Temperatura</h1>
-        <div class="user-controls">
-            <button id="theme-toggle" aria-label="Cambiar tema"><i class="fas fa-moon"></i></button>
-            <button class="btn btn-user" id="userBtn"><i class="fas fa-user"></i> <%= usuario.nombre %></button>
-            <button class="btn btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
-        </div>
+        <h1>Bienvenido, <%= usuario %></h1>
+        <a href="/logout">Cerrar sesión</a>
     </header>
 
-    <section>
-        <h2>Gráfica: Termocupla vs PT100</h2>
-        <figure class="highcharts-figure">
-            <div id="combined-chart"></div>
-        </figure>
-    </section>
-
-    <section>
-        <h2>Gráfica: Termocupla</h2>
-        <figure class="highcharts-figure">
-            <div id="termocupla-chart"></div>
-        </figure>
-    </section>
-
-    <section>
-        <h2>Gráfica: PT100</h2>
-        <figure class="highcharts-figure">
-            <div id="pt100-chart"></div>
-        </figure>
-    </section>
+    <div id="container"></div>
+    <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
 
     <script>
-        const apiUrl = '/api/data'; // Cambia esto por tu endpoint
+        Highcharts.chart('container', {
+            chart: {
+                type: 'areaspline'
+            },
+            title: {
+                text: 'Termocupla vs PT100'
+            },
+            series: [{
+                name: 'Serie',
+                data: []
+            }, {
+                name: 'Temperatura',
+                data: []
+            }],
+            xAxis: {
+                type: 'datetime',
+                title: { text: 'Tiempo' },
+                labels: { format: '{value:%Y-%m-%d %H:%M:%S}' },
+                tickInterval: 1000 * 60 * 60
+            },
+            yAxis: {
+                title: { text: 'Temperatura (°C)' },
+                max: 250,
+                labels: { formatter: function() { return this.value + '°C'; } }
+            }
+        });
 
-        function createChart(container, title, seriesData, yAxisTitle) {
-            Highcharts.chart(container, {
-                chart: { type: 'line' },
-                title: { text: title },
-                xAxis: { type: 'datetime', title: { text: 'Tiempo' }, labels: { format: '{value:%Y-%m-%d %H:%M:%S}' } },
-                yAxis: { title: { text: yAxisTitle }, max: 250, labels: { formatter: function () { return this.value + '°C'; } } },
-                tooltip: {
-                    formatter: function () {
-                        var date = new Date(this.x);
-                        return `<b>${this.series.name}</b><br/>${date.toLocaleDateString()} ${date.toLocaleTimeString()}<br/>${this.y}°C`;
-                    }
-                },
-                series: seriesData,
-                legend: { enabled: true }
-            });
-        }
-
-        function updateCharts() {
-            fetch(apiUrl)
+        function updateChart() {
+            fetch('/data')
                 .then(response => response.json())
                 .then(data => {
-                    const seriesData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
+                    const chart = Highcharts.charts[0];
+                    const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
                     const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
-                    const limitedSerieData = seriesData.slice(-10);
-                    const limitedTemperaturaData = temperaturaData.slice(-10);
 
-                    createChart('combined-chart', 'Termocupla vs PT100', [
-                        { name: 'Serie', data: limitedSerieData, color: '#32CD32' },
-                        { name: 'Temperatura', data: limitedTemperaturaData, color: '#FF5733' }
-                    ], 'Temperatura (°C)');
-
-                    createChart('termocupla-chart', 'Temperatura Termocupla', [
-                        { name: 'Termocupla', data: limitedSerieData, color: '#32CD32' }
-                    ], 'Temperatura (°C)');
-
-                    createChart('pt100-chart', 'Temperatura PT100', [
-                        { name: 'PT100', data: limitedTemperaturaData, color: '#FF5733' }
-                    ], 'Temperatura (°C)');
+                    chart.series[0].setData(serieData);
+                    chart.series[1].setData(temperaturaData);
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        setInterval(updateCharts, 5000);
-        updateCharts();
+        setInterval(updateChart, 5000);
+        updateChart();
     </script>
 </body>
 </html>

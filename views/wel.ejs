@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenido a Nuestra Página</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .welcome-container {
+            background-color: #fff;
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .welcome-container h1 {
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+        .welcome-container p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .welcome-container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .welcome-container .contact-info {
+            margin-bottom: 20px;
+        }
+        .welcome-container .contact-info p {
+            margin: 5px 0;
+        }
+        .welcome-container .login-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .welcome-container .login-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Bienvenido a [Tu Página]</h1>
+        <p>Somos una empresa dedicada a proporcionar las mejores soluciones en medición de temperatura. Nuestra plataforma ofrece herramientas avanzadas para monitorear y analizar datos en tiempo real.</p>
+        <div class="contact-info">
+            <p><strong>Teléfono:</strong> +1 234 567 890</p>
+            <p><strong>Correo Electrónico:</strong> contacto@tupagina.com</p>
+        </div>
+        <img src="ruta/a/tu/grafico.png" alt="Gráfico de Ejemplo">
+        <button class="login-btn" onclick="window.location.href='/login'">Iniciar Sesión</button>
+    </div>
+</body>
+</html>

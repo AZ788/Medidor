@@ -82,7 +82,12 @@
             },
             title: {
                 text: 'Termocupla vs PT100'
-            },
+            },tooltip: {
+                    formatter: function () {
+                        var date = new Date(this.x);
+                        return `<b>${this.series.name}</b><br/>${date.toLocaleDateString()} ${date.toLocaleTimeString()}<br/>${this.y}°C`;
+                    }
+                },
             series: [{
                 name: 'Serie',
                 data: []
@@ -102,7 +107,7 @@
                 labels: { formatter: function() { return this.value + '°C'; } }
             }
         });
-
+        
         function updateChart() {
             fetch('/data')
                 .then(response => response.json())
@@ -120,7 +125,80 @@
         setInterval(updateChart, 5000);
         updateChart();
     </script>
-
+        <section>
+            <h2>Gráfico de Termocupla</h2>
+            <div id="termocuplaChart"></div>
+        </section>
+    
+        <section>
+            <h2>Gráfico de PT100</h2>
+            <div id="pt100Chart"></div>
+        </section>
+        <script type="text/javascript">
+            const defaultData = 'api.php';
+    
+            function createChart(container, series) {
+                Highcharts.chart(container, {
+                    chart: { type: 'areaspline' },
+                    title: { text: series.title },
+                    xAxis: { type: 'datetime', title: { text: 'Tiempo' } },
+                    yAxis: { title: { text: 'Temperatura (°C)' } },
+                    tooltip: {
+                        formatter: function () {
+                            var date = new Date(this.x);
+                            return `<b>${this.series.name}</b><br/>${date.toLocaleDateString()} ${date.toLocaleTimeString()}<br/>${this.y}°C`;
+                        }
+                    },
+                    series: [series],
+                    plotOptions: {
+                        areaspline: {
+                            marker: { lineWidth: 1, lineColor: null, fillColor: 'white' },
+                            fillColor: {
+                                linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                                stops: [
+                                    [0, series.fillStartColor],
+                                    [1, series.fillEndColor]
+                                ]
+                            }
+                        }
+                    }
+                });
+            }
+    
+            function fetchDataAndUpdateCharts() {
+                fetch(defaultData)
+                    .then(response => response.json())
+                    .then(data => {
+                        const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
+                        const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+                        
+    
+                        // Gráfico individual Termocupla
+                        createChart('termocuplaChart', {
+                            title: 'Gráfico de Termocupla',
+                            name: 'Termocupla',
+                            data: serieData.slice(-10),
+                            color: 'rgba(95, 218, 147, 1)',
+                            fillStartColor: 'rgba(95, 218, 147, 0.2)',
+                            fillEndColor: 'rgba(95, 218, 147, 0)'
+                        });
+    
+                        // Gráfico individual PT100
+                        createChart('pt100Chart', {
+                            title: 'Gráfico de PT100',
+                            name: 'PT100',
+                            data: temperaturaData.slice(-10),
+                            color: 'rgba(255, 87, 51, 1)',
+                            fillStartColor: 'rgba(255, 87, 51, 0.2)',
+                            fillEndColor: 'rgba(255, 87, 51, 0)'
+                        });
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+    
+            setInterval(fetchDataAndUpdateCharts, 5000);
+            fetchDataAndUpdateCharts();
+        </script>
     <footer>
         <p>Temperatubies© 2024 | <a href="#">Términos y condiciones</a></p>
     </footer>

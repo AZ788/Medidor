@@ -100,7 +100,7 @@
 
     .graficas {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       flex-wrap: wrap;
     }
 
@@ -113,6 +113,11 @@
       border-radius: 10px;
       padding: 20px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .grafica.completa {
+      flex-basis: 100%;
+      margin: 20px 0;
     }
 
     footer {
@@ -175,8 +180,8 @@
     <div class="graficas">
       <div class="grafica" id="termocupla-grafica"></div>
       <div class="grafica" id="pt100-grafica"></div>
-      <div class="grafica" id="combinada-grafica"></div>
     </div>
+    <div class="grafica completa" id="combinada-grafica"></div>
   </div>
 
   <script>
@@ -320,7 +325,7 @@
   </script>
 
   <footer>
-    <p>Desarrollado por <a href="#">Tu Nombre</a> - © 2024</p>
+    <p>Desarrollado por <a href="#">CTLB</a> - © 2024</p>
   </footer>
 
 </body>

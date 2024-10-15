@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mediciones de Temperatura</title>
-  <link href="/estilos.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/data.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -14,14 +12,14 @@
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
   <style>
     body {
-      font-family: 'Open Sans', sans-serif;
-      background-color: #f0f4f8;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f7f9fc;
       color: #333;
       margin: 0;
       padding: 0;
     }
     header {
-      background-color: #0056b3;
+      background-color: #007bff;
       padding: 20px;
       text-align: center;
       color: #fff;
@@ -36,7 +34,7 @@
       color: #fff;
       text-decoration: none;
       font-weight: bold;
-      background-color: #ff6347;
+      background-color: #dc3545;
       padding: 10px 15px;
       border-radius: 5px;
       transition: background-color 0.3s ease;
@@ -50,7 +48,7 @@
       margin-right: 5px;
     }
     header .cerrar-sesion:hover {
-      background-color: #ff4500;
+      background-color: #c82333;
     }
     #container {
       margin: 40px auto;
@@ -68,7 +66,7 @@
       margin: 20px 0;
     }
     footer {
-      background-color: #0056b3;
+      background-color: #007bff;
       padding: 15px;
       text-align: center;
       color: #fff;
@@ -77,7 +75,7 @@
       bottom: 0;
     }
     footer a {
-      color: #ff6347;
+      color: #ffc107;
       text-decoration: none;
     }
     footer a:hover {
@@ -87,6 +85,7 @@
       display: flex;
       justify-content: space-around;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
     .temperatura-actual .cuadro {
       background-color: #fff;
@@ -96,6 +95,11 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 200px;
       text-align: center;
+      margin: 10px;
+      transition: transform 0.3s ease;
+    }
+    .temperatura-actual .cuadro:hover {
+      transform: translateY(-5px);
     }
     .temperatura-actual .cuadro .titulo {
       font-size: 1.5rem;
@@ -105,12 +109,13 @@
     .temperatura-actual .cuadro .valor {
       font-size: 3rem;
       font-weight: bold;
-      color: #0056b3;
+      color: #007bff;
     }
     .graficas {
       display: flex;
       justify-content: space-around;
       margin-top: 40px;
+      flex-wrap: wrap ;
     }
     .grafica {
       width: 45%;
@@ -121,205 +126,77 @@
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+    .resumen {
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      margin: 20px auto;
+    }
+    .resumen .titulo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .resumen .descripcion {
+      font-size: 1.2rem;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Bienvenido, <%= usuario %></h1>
-    <a href="/logout" class="cerrar-sesion">
-      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-    </a>
+    <a href="#" class="cerrar-sesion">Cerrar sesión <i class="fas fa-sign-out-alt"></i></a>
   </header>
-  <div class="temperatura-actual">
-    <div class="cuadro">
-      <div class="titulo">Serie</div>
-      <div class="valor" id="valor-serie">0°C</div>
+  <main>
+    <div id="container">
+      <div class="temperatura-actual">
+        <div class="cuadro">
+          <p class="titulo">Serie actual</p>
+          <p id="valor-serie" class="valor">--</p>
+        </div>
+        <div class="cuadro">
+          <p class="titulo">Temperatura actual</p>
+          <p id="valor-temperatura" class="valor">--</p>
+        </div>
+      </div>
+      <div class="resumen">
+        <p class="titulo">Resumen</p>
+        <p class="descripcion">La temperatura actual es de <span id="resumen-temperatura">--</span>°C, con una serie actual de <span id="resumen-serie">--</span>°C.</p>
+      </div>
+      <div class="graficas">
+        <div class="grafica" id="grafica-serie"></div>
+        <div class="grafica" id="grafica-temperatura"></div>
+      </div>
     </div>
-    <div class="cuadro">
-      <div class="titulo">Temperatura</div>
-      <div class="valor" id="valor-temperatura">0°C</div>
-    </div>
-  </div>
-  <div id="container"></div>
-  <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
+  </main>
+  <footer>
+    <p>&copy; 2023 - <%= usuario %></p>
+    <a href="#">Acerca de</a>
+  </footer>
   <script>
-    Highcharts.chart('container', {
-      chart: {
-        type: 'areaspline'
-      },
-      title: {
-        text: 'Termocupla vs PT100',
-        style: {
-          fontSize: '1.8rem',
-          fontWeight: 'bold'
-        }
-      },
-      series: [{
-        name: 'Serie',
-        data: []
-      }, {
-        name: 'Temperatura',
-        data: []
-      }],
-      xAxis: {
-        type: 'datetime',
-        title: {
-          text: 'Tiempo'
-        },
-        labels: {
-          format: '{value:%d-%m-%Y %H:%M:%S}'
-        },
-        tickInterval: 1000 * 60 * 60
-      },
-      yAxis: {
-        title: {
-          text: 'Temperatura (°C)'
-        },
-        max: 250,
-        labels: {
-          formatter: function() {
-            return this.value + '°C';
-          }
-        }
-      },
-      tooltip: {
-        shared: true,
-        crosshairs: true
-      },
-      plotOptions: {
-        areaspline: {
-          fillOpacity: 0.5
-        }
-      }
-    });
     function updateChart() {
       fetch('/data')
         .then(response => response.json())
         .then(data => {
-          const chart = Highcharts.charts[0];
-          const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
-          const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
-          chart.series[0].setData(serieData);
-          chart.series[1].setData(temperaturaData);
+          const chartSerie = Highcharts.charts[0];
+          const chartTemperatura = Highcharts.charts[1];
+          const serieData = data.map(item => [item.Serie, parseFloat(item.Serie)]);
+          const temperaturaData = data.map(item => [item.Temperatura, parseFloat(item.Temperatura)]);
+          chartSerie.series[0].setData(serieData);
+          chartTemperatura.series[0].setData(temperaturaData);
           document.getElementById('valor-serie').innerHTML = serieData[serieData.length - 1][1].toFixed(2) + '°C';
           document.getElementById('valor-temperatura').innerHTML = temperaturaData[temperaturaData.length - 1][1].toFixed(2) + '°C';
+          document.getElementById('resumen-temperatura').innerHTML = temperaturaData[temperaturaData.length - 1][1].toFixed(2) + '°C';
+          document.getElementById('resumen-serie').innerHTML = serieData[serieData.length - 1][1].toFixed(2) + '°C';
         })
         .catch(error => console.error('Error fetching data:', error));
     }
-    setInterval(updateChart, 500);
     updateChart();
+    setInterval(updateChart, 500); // actualiza la gráfica cada 1 minuto
   </script>
-  <div class="graficas">
-    <div class="grafica">
-      <div id="pt100-chart"></div>
-      <p class="highcharts-description">Gráfica de la temperatura PT100.</p>
-    </div>
-    <div class="grafica">
-      <div id="termocupla-chart"></div>
-      <p class="highcharts-description">Gráfica de la temperatura Termocupla.</p>
-    </div>
-  </div>
-  <script>
-    Highcharts.chart('pt100-chart', {
-      chart: {
-        type: 'line'
-      },
-      title: {
-        text: 'Temperatura PT100',
-        style: {
-          fontSize: '1.8rem',
-          fontWeight: 'bold'
-        }
-      },
-      series: [{
-        name: 'PT100',
-        data: []
-      }],
-      xAxis: {
-        type: 'datetime',
-        title: {
-          text: 'Tiempo'
-        },
-        labels: {
-          format: '{value:%d-%m-%Y %H:%M:%S}'
-        },
-        tickInterval: 1000 * 60 * 60
-      },
-      yAxis: {
-        title: {
-          text: 'Temperatura (°C)'
-        },
-        max: 250,
-        labels: {
-          formatter: function() {
-            return this.value + '°C';
-          }
-        }
-      },
-      tooltip: {
-        shared: true,
-        crosshairs: true
-      }
-    });
-    Highcharts.chart('termocupla-chart', {
-      chart: {
-        type: 'line'
-      },
-      title: {
-        text: 'Temperatura Termocupla',
-        style: {
-          fontSize: '1.8rem',
-          fontWeight: 'bold'
-        }
-      },
-      series: [{
-        name: 'Termocup la',
-        data: []
-      }],
-      xAxis: {
-        type: 'datetime',
-        title: {
-          text: 'Tiempo'
-        },
-        labels: {
-          format: '{value:%d-%m-%Y %H:%M:%S}'
-        },
-        tickInterval: 1000 * 60 * 60
-      },
-      yAxis: {
-        title: {
-          text: 'Temperatura (°C)'
-        },
-        max: 250,
-        labels: {
-          formatter: function() {
-            return this.value + '°C';
-          }
-        }
-      },
-      tooltip: {
-        shared: true,
-        crosshairs: true
-      }
-    });
-    function updateCharts() {
-      fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-          const pt100Chart = Highcharts.charts[1];
-          const termocuplaChart = Highcharts.charts[2];
-          const pt100Data = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
-          const termocuplaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
-          pt100Chart.series[0].setData(pt100Data);
-          termocuplaChart.series[0].setData(termocuplaData);
-        })
-        .catch(error => console.error('Error fetching data:', error));
-    }
-    setInterval(updateCharts, 500);
-    updateCharts();
-  </script>
-  <footer>
-    <p>Temperatubies 2024 | <a href="#">Términos y condiciones</a></p>
-  </footer>
 </body>
 </html>

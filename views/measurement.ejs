@@ -15,111 +15,137 @@
   <style>
     body {
       font-family: 'Open Sans', sans-serif;
-      background-color: #f0f4f8;
+      background-color: #eef2f7;
       color: #333;
       margin: 0;
       padding: 0;
+      transition: background-color 0.3s ease;
     }
+
     header {
-      background-color: #0056b3;
+      background-color: #0066cc;
       padding: 20px;
       text-align: center;
-      color: #fff;
-      position: relative;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
+
     header h1 {
-      margin: 0;
       font-size: 2.5rem;
       letter-spacing: 1px;
     }
+
     header .cerrar-sesion {
-      color: #fff;
+      color: white;
       text-decoration: none;
       font-weight: bold;
-      background-color: #ff6347;
+      background-color: #ff6b6b;
       padding: 10px 15px;
       border-radius: 5px;
-      transition: background-color 0.3s ease;
       position: absolute;
       top: 20px;
       right: 20px;
       display: flex;
       align-items: center;
+      transition: background-color 0.3s ease;
     }
+
     header .cerrar-sesion i {
       margin-right: 5px;
     }
+
     header .cerrar-sesion:hover {
-      background-color: #ff4500;
+      background-color: #ff3b3b;
     }
+
     #container {
       margin: 40px auto;
       width: 90%;
       max-width: 1200px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      background-color: #fff;
+      background-color: white;
       padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     }
-    .highcharts-description {
-      text-align: center;
-      font-size: 1.2rem;
-      color: #666;
-      margin: 20px 0;
-    }
-    footer {
-      background-color: #0056b3;
-      padding: 15px;
-      text-align: center;
-      color: #fff;
-      position: fixed;
-      width: 100%;
-      bottom: 0;
-    }
-    footer a {
-      color: #ff6347;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+
     .temperatura-actual {
       display: flex;
       justify-content: space-around;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #fafafa;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
     .temperatura-actual .cuadro {
       background-color: #fff;
-      border: 1px solid #ddd;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 200px;
       text-align: center;
     }
-    .temperatura-actual .cuadro .titulo {
-      font-size: 1.5rem;
-      font-weight: bold;
+
+    .temperatura-actual .titulo {
+      font-size: 1.4rem;
+      font-weight: 600;
       margin-bottom: 10px;
     }
-    .temperatura-actual .cuadro .valor {
-      font-size: 3rem;
+
+    .temperatura-actual .valor {
+      font-size: 2.8rem;
       font-weight: bold;
-      color: #0056b3;
+      color: #0066cc;
+      animation: fadeIn 0.5s ease-in-out;
     }
+
     .graficas {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-around;
-      margin-top: 40px;
+      gap: 30px;
     }
+
     .grafica {
-      width: 45%;
+      flex: 1;
+      min-width: 300px;
       height: 300px;
-      margin: 20px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    footer {
+      background-color: #0066cc;
+      padding: 15px;
+      text-align: center;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    footer a {
+      color: #ff6b6b;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -130,6 +156,7 @@
       <i class="fas fa-sign-out-alt"></i> Cerrar sesión
     </a>
   </header>
+
   <div class="temperatura-actual">
     <div class="cuadro">
       <div class="titulo">Serie</div>
@@ -140,15 +167,18 @@
       <div class="valor" id="valor-temperatura">0°C</div>
     </div>
   </div>
+
   <div id="container"></div>
   <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
+
   <script>
     Highcharts.chart('container', {
       chart: {
-        type: 'areaspline'
+        type: 'areaspline',
+        backgroundColor: '#f9f9f9'
       },
       title: {
-        text: 'Termocupla vs PT100',
+        text: 'Comparativa Termocupla vs PT100',
         style: {
           fontSize: '1.8rem',
           fontWeight: 'bold'
@@ -188,10 +218,14 @@
       },
       plotOptions: {
         areaspline: {
-          fillOpacity: 0.5
+          fillOpacity: 0.4,
+          animation: {
+            duration: 800
+          }
         }
       }
     });
+
     function updateChart() {
       fetch('/data')
         .then(response => response.json())
@@ -201,14 +235,17 @@
           const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
           chart.series[0].setData(serieData);
           chart.series[1].setData(temperaturaData);
+
           document.getElementById('valor-serie').innerHTML = serieData[serieData.length - 1][1].toFixed(2) + '°C';
           document.getElementById('valor-temperatura').innerHTML = temperaturaData[temperaturaData.length - 1][1].toFixed(2) + '°C';
         })
         .catch(error => console.error('Error fetching data:', error));
     }
+
     setInterval(updateChart, 500);
     updateChart();
   </script>
+
   <div class="graficas">
     <div class="grafica">
       <div id="pt100-chart"></div>
@@ -219,10 +256,12 @@
       <p class="highcharts-description">Gráfica de la temperatura Termocupla.</p>
     </div>
   </div>
+
   <script>
     Highcharts.chart('pt100-chart', {
       chart: {
-        type: 'line'
+        type: 'line',
+        backgroundColor: '#f9f9f9'
       },
       title: {
         text: 'Temperatura PT100',
@@ -255,15 +294,13 @@
             return this.value + '°C';
           }
         }
-      },
-      tooltip: {
-        shared: true,
-        crosshairs: true
       }
     });
+
     Highcharts.chart('termocupla-chart', {
       chart: {
-        type: 'line'
+        type: 'line',
+        backgroundColor: '#f9f9f9'
       },
       title: {
         text: 'Temperatura Termocupla',
@@ -273,7 +310,7 @@
         }
       },
       series: [{
-        name: 'Termocup la',
+        name: 'Termocupla',
         data: []
       }],
       xAxis: {
@@ -296,30 +333,28 @@
             return this.value + '°C';
           }
         }
-      },
-      tooltip: {
-        shared: true,
-        crosshairs: true
       }
     });
-    function updateCharts() {
+
+    setInterval(() => {
       fetch('/data')
         .then(response => response.json())
         .then(data => {
           const pt100Chart = Highcharts.charts[1];
           const termocuplaChart = Highcharts.charts[2];
-          const pt100Data = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
-          const termocuplaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+
+          const pt100Data = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
+          const termocuplaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
+
           pt100Chart.series[0].setData(pt100Data);
           termocuplaChart.series[0].setData(termocuplaData);
         })
         .catch(error => console.error('Error fetching data:', error));
-    }
-    setInterval(updateCharts, 500);
-    updateCharts();
+    }, 500);
   </script>
+
   <footer>
-    <p>Temperatubies 2024 | <a href="#">Términos y condiciones</a></p>
+    <p>Desarrollado por <a href="#">Tu Nombre</a> - © 2024</p>
   </footer>
 </body>
 </html>

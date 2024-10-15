@@ -84,9 +84,28 @@
       text-decoration: underline;
     }
     .temperatura-actual {
-      font-size: 2.5rem;
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .temperatura-actual .cuadro {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 200px;
+      text-align: center;
+    }
+    .temperatura-actual .cuadro .titulo {
+      font-size: 1.5rem;
       font-weight: bold;
       margin-bottom: 10px;
+    }
+    .temperatura-actual .cuadro .valor {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #0056b3;
     }
   </style>
 </head>
@@ -98,8 +117,14 @@
     </a>
   </header>
   <div class="temperatura-actual">
-    <span id="temperatura-serie">Serie: <span id="valor-serie">0°C</span></span>
-    <span id="temperatura-temperatura">Temperatura: <span id="valor-temperatura">0°C</span></span>
+    <div class="cuadro">
+      <div class="titulo">Serie</div>
+      <div class="valor" id="valor-serie">0°C</div>
+    </div>
+    <div class="cuadro ">
+      <div class="titulo">Temperatura</div>
+      <div class="valor" id="valor-temperatura">0°C</div>
+    </div>
   </div>
   <div id="container"></div>
   <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>

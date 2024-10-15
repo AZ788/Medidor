@@ -16,53 +16,81 @@
         <a href="/logout">Cerrar sesión</a>
     </header>
 
-    <div id="container"></div>
-    <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
+    <!-- Gráfico combinado -->
+    <section>
+        <h2>Termocupla vs PT100 (Gráfico combinado)</h2>
+        <div id="combinedChart"></div>
+        <p class="highcharts-description">Gráfica de la temperatura de la termocupla y el PT100.</p>
+    </section>
+
+    <!-- Gráfico individual de Termocupla -->
+    <section>
+        <h2>Gráfico de Termocupla</h2>
+        <div id="termocuplaChart"></div>
+    </section>
+
+    <!-- Gráfico individual de PT100 -->
+    <section>
+        <h2>Gráfico de PT100</h2>
+        <div id="pt100Chart"></div>
+    </section>
 
     <script>
-        Highcharts.chart('container', {
-            chart: {
-                type: 'areaspline'
-            },
-            title: {
-                text: 'Termocupla vs PT100'
-            },
-            series: [{
-                name: 'Serie',
-                data: []
-            }, {
-                name: 'Temperatura',
-                data: []
-            }],
-            xAxis: {
-                type: 'datetime',
-                title: { text: 'Tiempo' },
-                labels: { format: '{value:%Y-%m-%d %H:%M:%S}' },
-                tickInterval: 1000 * 60 * 60
-            },
-            yAxis: {
-                title: { text: 'Temperatura (°C)' },
-                max: 250,
-                labels: { formatter: function() { return this.value + '°C'; } }
-            }
-        });
+        function createChart(container, title, name, data, color) {
+            Highcharts.chart(container, {
+                chart: { type: 'areaspline' },
+                title: { text: title },
+                xAxis: {
+                    type: 'datetime',
+                    title: { text: 'Tiempo' },
+                    labels: { format: '{value:%Y-%m-%d %H:%M:%S}' },
+                    tickInterval: 1000 * 60 * 60 // 1 hora
+                },
+                yAxis: {
+                    title: { text: 'Temperatura (°C)' },
+                    max: 250,
+                    labels: { formatter: function() { return this.value + '°C'; } }
+                },
+                series: [{
+                    name: name,
+                    data: data,
+                    color: color
+                }],
+                plotOptions: {
+                    areaspline: {
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                }
+            });
+        }
 
-        function updateChart() {
+        function updateCharts() {
             fetch('/data')
                 .then(response => response.json())
                 .then(data => {
-                    const chart = Highcharts.charts[0];
                     const serieData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Serie)]);
                     const temperaturaData = data.map(item => [Date.parse(item.Fecha), parseFloat(item.Temperatura)]);
 
-                    chart.series[0].setData(serieData);
-                    chart.series[1].setData(temperaturaData);
+                    // Gráfico combinado
+                    createChart('combinedChart', 'Termocupla vs PT100', 'Serie y Temperatura', [
+                        { name: 'Termocupla', data: serieData, color: 'rgba(95, 218, 147, 1)' },
+                        { name: 'PT100', data: temperaturaData, color: 'rgba(255, 87, 51, 1)' }
+                    ]);
+
+                    // Gráfico individual de Termocupla
+                    createChart('termocuplaChart', 'Gráfico de Termocupla', 'Termocupla', serieData, 'rgba(95, 218, 147, 1)');
+
+                    // Gráfico individual de PT100
+                    createChart('pt100Chart', 'Gráfico de PT100', 'PT100', temperaturaData, 'rgba(255, 87, 51, 1)');
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        setInterval(updateChart, 5000);
-        updateChart();
+        // Actualiza las gráficas cada 5 segundos
+        setInterval(updateCharts, 5000);
+        updateCharts();
     </script>
 </body>
 </html>

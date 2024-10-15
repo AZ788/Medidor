@@ -6,6 +6,7 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const routes = require('./routes/auth');
+const apiRoutes = require('./routes/api');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,10 @@ db.connect(err => {
   if (err) throw err;
   console.log('Conectado a la base de datos MySQL');
 });
+ 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: true }));
 
 // Configuraciones de Express
 app.set('view engine', 'ejs');
@@ -34,8 +39,18 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// Rutas para las vistas
+app.get('/pt100', (req, res) => {
+  if (req.session.userId) {
+    res.render('pt100');  // Renderizamos el archivo pt100.ejs
+  } else {
+    res.redirect('/login');  // Redirigir si no está autenticado
+  }
+});
+
 // Rutas
 app.use('/', routes);
+app.use('/api', apiRoutes);  // Rutas de la API
 
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);

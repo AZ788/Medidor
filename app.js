@@ -47,7 +47,9 @@ app.get('/pt100', (req, res) => {
     res.redirect('/login');  // Redirigir si no está autenticado
   }
 });
-
+router.get('/wel', (req, res) => {
+  res.render('welcome');
+});
 // Rutas
 app.use('/', routes);
 app.use('/api', apiRoutes);  // Rutas de la API

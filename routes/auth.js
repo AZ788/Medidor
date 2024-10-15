@@ -54,6 +54,7 @@ router.post('/login', (req, res) => {
 
 // Ruta de registro
 router.get('/register', (req, res) => {
+  
   res.render('register', { error: null });
 });
 
@@ -118,14 +119,27 @@ router.get('/confirm/:token', (req, res) => {
   });
 });
 
-// Ruta de medición
+// Ruta de medición (measurement)
 router.get('/measurement', (req, res) => {
   if (req.session.userId) {
-    res.render('measurement');
+    // Obtén el nombre del usuario de la base de datos utilizando su ID de sesión
+    const userId = req.session.userId;
+    
+    db.query('SELECT nombre FROM users WHERE id = ?', [userId], (err, results) => {
+      if (err) throw err;
+      
+      if (results.length > 0) {
+        const usuario = results[0];  // Información del usuario
+        res.render('measurement', { usuario });  // Pasar 'usuario' al renderizar la vista
+      } else {
+        res.redirect('/login');  // Redirigir si el usuario no se encuentra
+      }
+    });
   } else {
-    res.redirect('/login');
+    res.redirect('/login');  // Redirigir si no está autenticado
   }
 });
+
 
 // Ruta para cerrar sesión
 router.get('/logout', (req, res) => {
